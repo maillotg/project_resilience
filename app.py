@@ -18,7 +18,7 @@ from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.model_selection import cross_val_score
 
 from xgboost import XGBRegressor
-
+from sklearn.neighbors import NearestNeighbors
 
 class CustomScaler(TransformerMixin, BaseEstimator): 
 # TransformerMixin generates a fit_transform method from fit and transform
@@ -119,6 +119,7 @@ y = (readiness*v)/(readiness+v)
 X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.4, random_state=1)
 
 
+
 reg=LinearRegression()
 reg = XGBRegressor()
 customscaler = CustomScaler()
@@ -159,11 +160,11 @@ st.write(cross_val_score(final_pipel, X_train, y_train, cv=8, scoring='r2').mean
 
 
 
-option = st.selectbox(
+option1 = st.selectbox(
      'How would you like to be contacted?',
      ('Yes', 'No', 'Do not know'),key="4")
 
-st.write('You selected:', option)
+st.write('You selected:', option1)
 
 option = st.selectbox(
      'How would you like to be contacted?',
@@ -195,15 +196,42 @@ option = st.selectbox(
 
 st.write('You selected:', option)
 
+pre=[option1]
+
+st.write(pre)
 
 
+Nn = NearestNeighbors(n_neighbors=3)
+
+Nearest = Pipeline([
+    ('preprocessing', preprocessor),
+    
+    ('knn', Nn)
+])
+numcol=['Hazards.Exposure.Level','Potable.Water.Supply.Percent','Adaptation.Challenges.Level','Electricity.Source.Renewable']
 
 
+predi=np.array([100.0,'No','Yes','Yes','No','No target','Yes',0.0,3.0,25.0]).reshape(1,10)
+#st.write(predi)
+
+pred = pd.DataFrame(data=predi,columns=col_to_use)
+#pred.iloc[0,:] = [100.0,'No','Yes','Yes','No','No target','Yes',0.0,3.0,25.0]
+print(pred)
+st.write(pred)
 
 
+pred[numcol] = pred[numcol].convert_objects(convert_numeric=True)
 
 
+final_voisin = Nearest.fit(X)
+pred_scale=Nearest.steps[0][1].transform(pred)
+print(pred_scale)
 
+#st.write(pred_scale)
+
+
+voisin = final_voisin.steps[1][1].kneighbors(pred_scale,n_neighbors=5)
+st.write(voisin)
 
 
 

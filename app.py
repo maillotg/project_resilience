@@ -19,7 +19,21 @@ from sklearn.model_selection import cross_val_score
 
 from xgboost import XGBRegressor
 from sklearn.neighbors import NearestNeighbors
+import folium
 
+from streamlit_folium import folium_static
+def ssminmaxe(x):
+    m=0
+    M=352
+    return (x-m)/(M-m)
+def ssminmax(x):
+    m=0
+    M=8
+    return (x-m)/(M-m)
+def ssminma(x):
+    m=0
+    M=100
+    return (x-m)/(M-m)
 class CustomScaler(TransformerMixin, BaseEstimator): 
 # TransformerMixin generates a fit_transform method from fit and transform
 # BaseEstimator generates get_params and set_params methods
@@ -41,8 +55,8 @@ class CustomScaler(TransformerMixin, BaseEstimator):
         return pd.DataFrame(X_transformed)
 
 st.markdown("""# Resilience Project
-## This is a sub header
-This is text""")
+## Quelque question:
+Facteur influant sur le changement climatique""")
 
 data_path="raw_data/CDP-Cities-KPI.csv"
 flo= ['Nb.Hazards.Type', 'Hazards.Exposure.Level',
@@ -109,11 +123,38 @@ def load_data():
 
 
 data=load_data()
+#data= data.drop_duplicates(subset = 'Account.Number',keep = 'first',inplace =False).copy().reset_index()
+#data = data.drop('index',axis=1)
+new1= data.copy()
+new1['vul']=v
+new1['readiness']=readiness
+data= new1.drop_duplicates(subset = 'Account.Number',keep = 'first',inplace =False).copy().reset_index()
+data = data.drop('index',axis=1)
+
+v=data['vul']
+readiness=data['readiness']
+
+#new1['Hazards.Exposure.Level']=new1['Hazards.Exposure.Level'].apply(cleanan)
+#new1['Adaptation.Challenges.Level']=new1['Adaptation.Challenges.Level'].apply(cleanan)
+#new1['Risk.Health.System']=new1['Risk.Health.System'].apply(strinan)
+#new1['Potable.Water.Supply.vulnerability']=new1['Potable.Water.Supply.Percent'].apply(pournan)
+
+#new1['exposure.level']=new1['Hazards.Exposure.Level'].apply(ssminmaxe)
+#new1['City.Adaptation.Challenges.Index'] =new1['Adaptation.Challenges.Level'].apply(ssminmax)
+#new1['Potable.Water.Supply.vulnerability']= new1['Potable.Water.Supply.vulnerability'].apply(ssminma)
+#new1['sensitivity.index']=(new1['Risk.Health.System'] + new1['Potable.Water.Supply.vulnerability'])/2
+#new1['Vulnerability']=(new1['exposure.level']+new1['City.Adaptation.Challenges.Index']+new1['sensitivity.index'])/3
+
+#v= new1['Vulnerability']
 #X=data[flo+cat]
 #X=data.drop(['Organization','City','Country','Unnamed: 0', 'Year.Reported.to.CDP', 'Account.Number','CDP.Region', 'First.Time.Discloser','Country.Code.3','City.Location'],1)
 X=data[col_to_use]
-st.write(X)
 
+df = data.copy()
+df['readiness']=readiness
+df['vulnerability']=v
+#st.write(X)
+#X
 y = (readiness*v)/(readiness+v)
 #y = readiness
 X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.4, random_state=1)
@@ -153,50 +194,56 @@ final_pipe_trained = final_pipel.fit(X_train,y_train)
 
 # Make predictions
 #final_pipe_trained.predict(X_test.iloc[0:2])
-
+facto={"Economic":"Access to basic service, Cost of living, Poverty, Unemployment, Economic health, economic diversity, and Budgetary capacity.","Health":"Access to healthcare and Public health","Education":"Access to education","Habitat":"Housing","Infrastructure":"Rapid urbanization, Infrastructure conditions / maintenance, and Infrastructure capacity","Social":"Inequality and Migration","Environment":"Resource availability, Environmental conditions","Governance":"safety and security,political engagement ,transparency"}
 # Score model
+st.write("Secteur pouvant affecter votre ville")
+st.write(facto)
 st.write(final_pipe_trained.score(X_test,y_test))
 st.write(cross_val_score(final_pipel, X_train, y_train, cv=8, scoring='r2').mean())
 
+st.sidebar.write('Questionnaire')
+challenlevel = st.sidebar.slider("Combien de facteur affecte grandement la capacité de votre ville à s'adapter au changement climatique?", 0, 8, 1)
+q_water =  st.sidebar.slider("A quel pourcentage d'eau potable votre ville à t elle accès",0,100,1)
+elec_source_renew= st.sidebar.slider("Pourcentage d'énergie renouvelable",0,100,1)
+hazardexpolvl = st.sidebar.slider("exposure lvl de catastrophe",0,400,1)
 
-
-option1 = st.selectbox(
-     'How would you like to be contacted?',
+option1 = st.sidebar.selectbox(
+     ' es que vous avez un risk health system?',
      ('Yes', 'No', 'Do not know'),key="4")
 
 st.write('You selected:', option1)
 
-option = st.selectbox(
-     'How would you like to be contacted?',
+option2 = st.sidebar.selectbox(
+     "avez vous un plan d'adaptation?",
      ('Yes', 'No', 'Do not know'),key="5")
 
-st.write('You selected:', option)
 
-option = st.selectbox(
-     'How would you like to be contacted?',
+
+option3 = st.sidebar.selectbox(
+     "avez vous un plan d'adaptation de reduction des émissions",
      ('Yes', 'No', 'Do not know'),key="6")
 
-st.write('You selected:', option)
 
-option = st.selectbox(
-     'How would you like to be contacted?',
+
+option4 = st.sidebar.selectbox(
+     "avez vous un plan de strategy de management de l'eau",
      ('Yes', 'No', 'Do not know'),key="1")
 
-st.write('You selected:', option)
 
-option = st.selectbox(
-     'How would you like to be contacted?',
+
+option5 = st.sidebar.selectbox(
+     "avez vous une cible pour les reduction d'émissions de gaz",
      ('Yes', 'No', 'Do not know'),key="2")
 
-st.write('You selected:', option)
 
-option = st.selectbox(
-     'How would you like to be contacted?',
+
+option6 = st.sidebar.selectbox(
+     "food consumption policies",
      ('Yes', 'No', 'Do not know'),key="3")
 
-st.write('You selected:', option)
 
-pre=[option1]
+
+pre=[hazardexpolvl,option1,option2,option3,option4,option5,option6,q_water,challenlevel,elec_source_renew]
 
 st.write(pre)
 
@@ -211,34 +258,61 @@ Nearest = Pipeline([
 numcol=['Hazards.Exposure.Level','Potable.Water.Supply.Percent','Adaptation.Challenges.Level','Electricity.Source.Renewable']
 
 
-predi=np.array([100.0,'No','Yes','Yes','No','No target','Yes',0.0,3.0,25.0]).reshape(1,10)
+#predi=np.array([100.0,'No','Yes','Yes','No','No target','Yes',0.0,3.0,25.0]).reshape(1,10)
 #st.write(predi)
+
+predi = np.array(pre).reshape(1,10)
 
 pred = pd.DataFrame(data=predi,columns=col_to_use)
 #pred.iloc[0,:] = [100.0,'No','Yes','Yes','No','No target','Yes',0.0,3.0,25.0]
-print(pred)
-st.write(pred)
-
+#print(pred)
+#st.write(pred)
+#st.dataframe(pred)
 
 pred[numcol] = pred[numcol].convert_objects(convert_numeric=True)
 
 
 final_voisin = Nearest.fit(X)
 pred_scale=Nearest.steps[0][1].transform(pred)
-print(pred_scale)
+#print(pred_scale)
 
 #st.write(pred_scale)
+nb_voisin = st.slider('définir une range de voisin pour votre ville?', 1, 10, 1)
 
-
-voisin = final_voisin.steps[1][1].kneighbors(pred_scale,n_neighbors=5)
+voisin = final_voisin.steps[1][1].kneighbors(pred_scale,n_neighbors=nb_voisin)
 st.write(voisin)
 
+ville_voisine= voisin[1][0]
+
+st.write(ville_voisine)
+
+zoom_start = 1
+m = folium.Map(location=[ 43.3,  5.4],zoom_start=zoom_start)
 
 
 
+for i in ville_voisine:
+    
+    icity= df.iloc[i]
+    lat=icity[55]
+    lon=icity[56]
+    txt=f'readiness score:{icity[58]} \n vulnerability score:{icity[59]} \n Orga:{icity[3]}'
+    print(txt)
+    #folium.Marker(
+    folium.CircleMarker(
+    
+    location=[lat,lon],
+    popup=txt,
+    #icon=folium.Icon(color=couleur)
+     
+    radius=5,
+    
+    color="green",
+    fill=True,
+    fill_color='gray' 
+    ).add_to(m)     
 
-
-
+folium_static(m)
 
 
 

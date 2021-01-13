@@ -47,23 +47,23 @@ def ssminma(x):
     m=0
     M=100
     return (x-m)/(M-m)
-class CustomScaler(TransformerMixin, BaseEstimator): 
+class CustomScaler(TransformerMixin, BaseEstimator):
 # TransformerMixin generates a fit_transform method from fit and transform
 # BaseEstimator generates get_params and set_params methods
     def __init__(self):
         pass
-        
-    
-    
+
+
+
     def fit(self, X, y=None):
         self.means = X.mean()
         self.max = X.max()
         self.min = X.min()
         return self
-    
+
     def transform(self, X, y=None):
         X= 100 - X
-        X_transformed = (X - self.min)/(self.max-self.min) 
+        X_transformed = (X - self.min)/(self.max-self.min)
         # Return result as dataframe for integration into ColumnTransformer
         return pd.DataFrame(X_transformed)
 
@@ -166,8 +166,22 @@ df['vulnerability']=v
 
 
 k = (readiness*(1-v))/(readiness+(1-v))
+#Our first y is vulnerability
 y = v
 X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.4, random_state=1)
+#Lets get our other y by taking the same dataset from our splitting and taking then the index
+
+#For readiness
+Xr_train = X_train.copy()
+Xr_test = X_test.copy()
+yr_train = df['readiness'].iloc[Xr_train.index]
+yr_test = df['readiness'].iloc[Xr_test.index]
+
+#For resilience score which is our k in this script
+Xk_train = X_train.copy()
+Xk_test = X_test.copy()
+yk_train = k.iloc[Xk_train.index]
+yk_test = k.iloc[Xk_test.index]
 
 
 
@@ -189,7 +203,7 @@ preprocessor = ColumnTransformer([
     ('water_transformer', water_transform,['Potable.Water.Supply.Percent']),
     ('num_transformer', num_transformer,  make_column_selector(dtype_include=['float64'])),
     ('cat_transformer', cat_transformer,  make_column_selector(dtype_include=['object']))
-    
+
     ])
 
 
@@ -262,7 +276,7 @@ Nn = NearestNeighbors(n_neighbors=3)
 
 Nearest = Pipeline([
     ('preprocessing', preprocessor),
-    
+
     ('knn', Nn)
 ])
 numcol=['Hazards.Exposure.Level','Potable.Water.Supply.Percent','Adaptation.Challenges.Level','Electricity.Source.Renewable']
@@ -288,10 +302,10 @@ pred_scale=Nearest.steps[0][1].transform(pred)
 
 #st.write(pred_scale)
 st.write("### Results")
-vul_predict=final_pipe_trained.predict(pred) 
+vul_predict=final_pipe_trained.predict(pred)
 st.write("Vulnerability: ",vul_predict[0])
 
-Xr_train, Xr_test, yr_train, yr_test = train_test_split(X,readiness, test_size=0.4, random_state=1)
+#Xr_train, Xr_test, yr_train, yr_test = train_test_split(X,readiness, test_size=0.4, random_state=1)
 
 
 final_piper_trained = final_pipel.fit(Xr_train,yr_train)
@@ -300,7 +314,7 @@ read_predict = final_piper_trained.predict(pred)
 st.write("Readiness: ",read_predict[0])
 st.write("Resilience score: ", (read_predict[0]*(1-vul_predict[0]))/(read_predict[0]+(1-vul_predict[0])))
 
-Xk_train, Xk_test, yk_train, yk_test = train_test_split(X,k, test_size=0.4, random_state=1)
+#Xk_train, Xk_test, yk_train, yk_test = train_test_split(X,k, test_size=0.4, random_state=1)
 
 
 final_pipek_trained = final_pipel.fit(Xk_train,yk_train)
@@ -329,7 +343,7 @@ m = folium.Map(location=[ 43.3,  5.4],zoom_start=zoom_start)
 
 
 for i in ville_voisine:
-    
+
     icity= df.iloc[i]
     lat=icity[55]
     lon=icity[56]
@@ -337,17 +351,17 @@ for i in ville_voisine:
     print(txt)
     #folium.Marker(
     folium.CircleMarker(
-    
+
     location=[lat,lon],
     popup=txt,
     #icon=folium.Icon(color=couleur)
-     
+
     radius=5,
-    
+
     color="green",
     fill=True,
-    fill_color='gray' 
-    ).add_to(m)     
+    fill_color='gray'
+    ).add_to(m)
 
 folium_static(m)
 

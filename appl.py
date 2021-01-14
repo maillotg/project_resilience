@@ -57,9 +57,8 @@ class CustomScaler(TransformerMixin, BaseEstimator):
         X_transformed = (X - self.min)/(self.max-self.min)
         # Return result as dataframe for integration into ColumnTransformer
         return pd.DataFrame(X_transformed)
-st.markdown("""# Resilience Project
-### Additional information:
-Factors impacting your adaptation to Climate Change""")
+st.markdown("""# Is your city resilient? """)
+
 data_path="raw_data/CDP-Cities-KPI.csv"
 flo= ['Nb.Hazards.Type', 'Hazards.Exposure.Level',
        'Adaptation.Challenges.Health', 'Adaptation.Challenges.Economic',
@@ -173,8 +172,7 @@ final_pipe_trained = final_pipel.fit(X_train,y_train)
 #final_pipe_trained.predict(X_test.iloc[0:2])
 facto={"Economic":"Access to basic service, Cost of living, Poverty, Unemployment, Economic health, economic diversity, and Budgetary capacity.","Health":"Access to healthcare and Public health","Education":"Access to education","Habitat":"Housing","Infrastructure":"Rapid urbanization, Infrastructure conditions / maintenance, and Infrastructure capacity","Social":"Inequality and Migration","Environment":"Resource availability, Environmental conditions","Governance":"safety and security,political engagement ,transparency"}
 # Score model
-st.write("List of sectors compiling the different factors")
-st.write(facto)
+
 #st.write(final_pipe_trained.score(X_test,y_test))
 #st.write(cross_val_score(final_pipel, X_train, y_train, cv=8, scoring='r2').mean())
 st.sidebar.write('Survey')
@@ -232,12 +230,12 @@ st.write("Readiness score: ",read_predict[0])
 st.write("Resilience score: ", (read_predict[0]*(1-vul_predict[0]))/(read_predict[0]+(1-vul_predict[0])))
 
 st.write("")
-st.write('#### Please select the number of neighbors to your city you want to see ? (From 1 to 10)')
+st.write('### Please select the number of neighbors to your city you want to see ? (From 1 to 10)')
 nb_voisin = st.slider('', 1, 10, 1)
 voisin = final_voisin.steps[1][1].kneighbors(pred_scale,n_neighbors=nb_voisin)
 st.write("Number of neighbors selected: ",nb_voisin)
 ville_voisine= voisin[1][0]
-#st.write(ville_voisine)
+st.write(ville_voisine)
 zoom_start = 1
 m = folium.Map(location=[ 43.3,  5.4],zoom_start=zoom_start)
 for i in ville_voisine:
@@ -260,3 +258,11 @@ for i in ville_voisine:
     ).add_to(m)
 
 folium_static(m)
+
+
+
+
+st.write("""### Additional information:
+Factors impacting your adaptation to Climate Change""")
+st.write("List of sectors compiling the different factors")
+st.write(facto)

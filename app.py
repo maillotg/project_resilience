@@ -67,9 +67,8 @@ class CustomScaler(TransformerMixin, BaseEstimator):
         # Return result as dataframe for integration into ColumnTransformer
         return pd.DataFrame(X_transformed)
 
-st.markdown("""# Resilience Project
-### Additional information:
-Factors impacting your adaptation to Climate Change""")
+st.markdown("""# Is your city resilient?""")
+
 
 data_path="raw_data/CDP-Cities-KPI.csv"
 
@@ -206,8 +205,7 @@ final_pipe_trained = final_pipel.fit(X_train,y_train)
 #final_pipe_trained.predict(X_test.iloc[0:2])
 facto={"Economic":"Access to basic service, Cost of living, Poverty, Unemployment, Economic health, economic diversity, and Budgetary capacity.","Health":"Access to healthcare and Public health","Education":"Access to education","Habitat":"Housing","Infrastructure":"Rapid urbanization, Infrastructure conditions / maintenance, and Infrastructure capacity","Social":"Inequality and Migration","Environment":"Resource availability, Environmental conditions","Governance":"safety and security,political engagement ,transparency"}
 # Score model
-st.write("List of sectors compiling the different factors")
-st.write(facto)
+
 #st.write(final_pipe_trained.score(X_test,y_test))
 #st.write(cross_val_score(final_pipel, X_train, y_train, cv=8, scoring='r2').mean())
 
@@ -305,7 +303,7 @@ Xk_train, Xk_test, yk_train, yk_test = train_test_split(X,k, test_size=0.4, rand
 
 final_pipek_trained = final_pipel.fit(Xk_train,yk_train)
 resilience_predict = final_pipek_trained.predict(pred)
-st.write("test pipe",resilience_predict[0])
+#st.write("test pipe",resilience_predict[0])
 
 
 
@@ -313,7 +311,7 @@ st.write("test pipe",resilience_predict[0])
 st.write("")
 
 
-st.write('#### Please select the number of neighbors to your city you want to see/know ? (From 1 to 10)')
+st.write('### Please select the number of neighbors to your city you want to see ? (From 1 to 10)')
 nb_voisin = st.slider('', 1, 10, 1)
 
 voisin = final_voisin.steps[1][1].kneighbors(pred_scale,n_neighbors=nb_voisin)
@@ -333,7 +331,7 @@ for i in ville_voisine:
     icity= df.iloc[i]
     lat=icity[55]
     lon=icity[56]
-    txt=f'readiness score:{icity[58]} \n vulnerability score:{icity[59]} \n Orga:{icity[3]}'
+    txt=f'readiness score:{icity[59]} \n vulnerability score:{icity[58]} \n Orga:{icity[3]}'
     print(txt)
     #folium.Marker(
     folium.CircleMarker(
@@ -353,3 +351,7 @@ folium_static(m)
 
 
 
+st.write("""### Additional information:
+Factors impacting your adaptation to Climate Change""")
+st.write("List of sectors compiling the different factors")
+st.write(facto)

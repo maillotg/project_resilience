@@ -103,7 +103,7 @@ col_to_use=[
 'Electricity.Source.Renewable']
 @st.cache
 def load_data():
-  data = pd.read_csv(data_path)
+  data = pd.read_csv(data_path,encoding = "utf-8")
   return data
 data=load_data()
 #data= data.drop_duplicates(subset = 'Account.Number',keep = 'first',inplace =False).copy().reset_index()
@@ -133,6 +133,7 @@ df['readiness']=readiness
 df['vulnerability']=v
 #st.write(X)
 #X
+df['Organization']
 k = (readiness*(1-v))/(readiness+(1-v))
 #Our first y is vulnerability
 y = v
@@ -235,7 +236,7 @@ nb_voisin = st.slider('', 1, 10, 1)
 voisin = final_voisin.steps[1][1].kneighbors(pred_scale,n_neighbors=nb_voisin)
 st.write("Number of neighbors selected: ",nb_voisin)
 ville_voisine= voisin[1][0]
-st.write(ville_voisine)
+#st.write(ville_voisine)
 zoom_start = 1
 m = folium.Map(location=[ 43.3,  5.4],zoom_start=zoom_start)
 for i in ville_voisine:
@@ -244,7 +245,7 @@ for i in ville_voisine:
     lat=icity[55]
     lon=icity[56]
     txt=f'readiness score:{icity[58]} \n vulnerability score:{icity[59]} \n Orga:{icity[3]}'
-    print(txt)
+    #print(txt)
     #folium.Marker(
     folium.CircleMarker(
 

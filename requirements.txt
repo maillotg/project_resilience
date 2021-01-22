@@ -10,3 +10,7 @@ yapf
 python-gitlab
 twine
 streamlit-folium
+scikit-learn
+xgboost
+folium
+numpy

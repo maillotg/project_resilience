@@ -60,6 +60,7 @@ class CustomScaler(TransformerMixin, BaseEstimator):
 st.markdown("""# Is your city resilient? """)
 
 data_path="raw_data/CDP-Cities-KPI.csv"
+data_path="app_data/CDP-Cities-KPI.csv"
 flo= ['Nb.Hazards.Type', 'Hazards.Exposure.Level',
        'Adaptation.Challenges.Health', 'Adaptation.Challenges.Economic',
        'Adaptation.Challenges.Environment',
@@ -85,8 +86,12 @@ cat=['Sustainability.Targets.Master.Planning',
        'Opportunities.Collaboration', 'Renewable.Energy.Target',
        'Energy.Efficnecy.Target', 'Low.Zero.Emission.Zone',
        'Food.Consumption.Policies', 'Water.Resource.Management.strategy']
-cri = pd.read_csv('raw_data/CRI.csv')
-vul = pd.read_csv('notebooks/vulnerability.csv')
+
+
+cri = pd.read_csv('app_data/CRI.csv')
+vul = pd.read_csv('app_data/vulnerability.csv')
+
+
 readiness=cri['City.Readiness.Index']
 v=vul['Vulnerability']
 #st.write(v)

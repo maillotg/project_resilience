@@ -138,7 +138,7 @@ df['readiness']=readiness
 df['vulnerability']=v
 #st.write(X)
 #X
-df['Organization']
+#df['Organization']
 k = (readiness*(1-v))/(readiness+(1-v))
 #Our first y is vulnerability
 y = v
@@ -221,7 +221,10 @@ pred = pd.DataFrame(data=predi,columns=col_to_use)
 #print(pred)
 #st.write(pred)
 #st.dataframe(pred)
-pred[numcol] = pred[numcol].convert_objects(convert_numeric=True)
+#pred[numcol] = pred[numcol].convert_objects(convert_numeric=True)
+pred[numcol]=pred[numcol].apply(pd.to_numeric)
+#pred.dtypes
+
 final_voisin = Nearest.fit(X)
 pred_scale=Nearest.steps[0][1].transform(pred)
 #print(pred_scale)
